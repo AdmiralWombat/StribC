@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Comments</title>
+	</head>
+	<body>
+		<h1>Comments</h1>
+
+		{% for comment in comments %}
+			{{ comments.message }} <br>
+		{% endfor %}
+	</body>
+</html>

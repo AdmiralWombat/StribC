@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ article.title }}
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'articles' back %}">Articles</a></li>
+<li class="breadcrumb-item active">{{ article.title }}</li>
+{% endblock %}
+
+{% block content %}
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>Date</th>
+            <th class="absorbing-column">Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comment in comments %}
+        <tr>
+            <td width="200">{{ comment.datePosted }}</td>
+            <td>
+                {{ comment.message }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

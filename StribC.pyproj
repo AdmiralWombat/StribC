@@ -1,0 +1,84 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>e4464fb5-233f-4922-9a41-305c3250276f</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>StribC.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>StribC</Name>
+    <RootNamespace>StribC</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="comments\admin.py" />
+    <Compile Include="comments\apps.py" />
+    <Compile Include="comments\management\commands\updateDB.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="comments\migrations\__init__.py" />
+    <Compile Include="comments\models.py" />
+    <Compile Include="comments\tests.py" />
+    <Compile Include="comments\views.py" />
+    <Compile Include="comments\__init__.py" />
+    <Compile Include="StribC.py" />
+    <Compile Include="StribC\asgi.py" />
+    <Compile Include="StribC\settings.py" />
+    <Compile Include="StribC\urls.py" />
+    <Compile Include="StribC\wsgi.py" />
+    <Compile Include="StribC\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="comments\" />
+    <Folder Include="comments\management\commands\" />
+    <Folder Include="comments\migrations\" />
+    <Folder Include="comments\management\" />
+    <Folder Include="static\" />
+    <Folder Include="static\css\" />
+    <Folder Include="StribC\" />
+    <Folder Include="StribC\__pycache__\" />
+    <Folder Include="templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="static\css\app.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="static\css\bootstrap.min.css" />
+    <Content Include="StribC\__pycache__\settings.cpython-38.pyc" />
+    <Content Include="StribC\__pycache__\urls.cpython-38.pyc" />
+    <Content Include="StribC\__pycache__\wsgi.cpython-38.pyc" />
+    <Content Include="StribC\__pycache__\__init__.cpython-38.pyc" />
+    <Content Include="templates\about.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\comments.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\base.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\articles.html" />
+    <Content Include="templates\home.html">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

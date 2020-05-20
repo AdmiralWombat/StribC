@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">{{ commenter_name }} Articles</li>
+{% endblock %}
+
+{% block content %}
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>Article</th>
+            <th>Count</th>
+            <th>Last Post</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for article in articles %}
+
+        <tr>
+            <td>
+                <a href="{% url 'comments' commenter article.pk %}">{{ article.title }}</a>
+                <small class="text-muted d-block">{{ article.datePosted }}</small>
+            </td>
+            <td class="align-middle">{{ article.numberOfComments }}</td>
+            <td class="align-middle">{{ article.lastPost }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
