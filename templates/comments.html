@@ -6,7 +6,7 @@
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'articles' back %}">Articles</a></li>
-<li class="breadcrumb-item active">{{ article.title }}</li>
+<li class="breadcrumb-item active"><a href="{{ article.url }}">{{ article.title }}</a></li>
 {% endblock %}
 
 {% block content %}

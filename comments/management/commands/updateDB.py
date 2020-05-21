@@ -11,6 +11,8 @@ from comments.models import Comment
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from datetime import datetime
+
 import sys
 import os
 
@@ -35,10 +37,15 @@ class Command(BaseCommand):
         if ospath == None:
             ospath = Path.home()
             self.storage_directory = os.path.join(ospath, '.DCN/WebScraping/')
+            self.storage_stats_directory = os.path.join(ospath, '.DCN/WebScraping/Data/')
             self.unix = 1
         else:
             self.storage_directory = os.path.join(ospath, 'DCN\\WebScraping\\')
+            self.storage_stats_directory = os.path.join(ospath, 'DCN\\WebScraping\\Data\\')
             self.unix = 0
+
+        self.newArticles = 0
+        self.newComments = 0
 
         #UserCommenter.objects.all().delete()
         #Article.objects.all().delete()
@@ -51,6 +58,13 @@ class Command(BaseCommand):
         print("STARTING")
         self._init()
         self._loadArticles()
+        self._saveStats()
+
+    def _saveStats(self):
+        print("SAVING STATS FILE")
+        filePath = self.storage_stats_directory + "updateDBStats.dat"
+        with open(filePath, 'a+') as f:
+            f.write(f"{datetime.now()}\tadded {self.newArticles} articles to database, with {self.newComments} new comments\n")
 
     def _loadArticles(self):
         print("LOADING")
@@ -78,7 +92,7 @@ class Command(BaseCommand):
         print("ADDING TO DB")           
         
         print(f"{root.article.url}")
-        urlnumber = re.findall(r"https://www.startribune.com/.+/([0-9]+)/", root.article.url)        
+        urlnumber = re.findall(r"startribune.com/.+/([0-9]+)/", root.article.url)
 
         if (len(urlnumber) > 0):
             try:
@@ -94,11 +108,14 @@ class Command(BaseCommand):
                 print("\tCreating new")
                 newArt.save()
                 article_id = newArt.id
+                self.newArticles += 1
             except Exception as e:
                 print("\tERROR FINDING")
                 print(e)
                 return
-
+        else:
+            print("ERROR: Shouldn't be here\n")
+            return
 
 
   
@@ -113,8 +130,9 @@ class Command(BaseCommand):
             self._traverse(node, article_id)
 
         newUser, newUserCreated = UserCommenter.objects.get_or_create(userName=nextnode.username)
-        Comment.objects.get_or_create(message=nextnode.text, datePosted=nextnode.date, username=nextnode.username, creator=UserCommenter(id=newUser.id), article=Article(id=article_id))       
-
+        newComment, newCommentCreated = Comment.objects.get_or_create(message=nextnode.text, datePosted=nextnode.date, username=nextnode.username, creator=UserCommenter(id=newUser.id), article=Article(id=article_id))
+        if (newCommentCreated):
+            self.newComments+=1
 
 
         
