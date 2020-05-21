@@ -16,7 +16,7 @@
     <tbody>
 
         {% for article in articles %}
-
+      
         <tr>
             <td>
                 <a href="{% url 'comments' commenter article.pk %}">{{ article.title }}</a>

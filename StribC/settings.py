@@ -25,7 +25,8 @@ SECRET_KEY = ')5wlpfk(_0wu$fx@#^b6lhz1i+i9__z10k&l0mxpjt#x)*&-g-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1',
+                 'stribc.duckdns.org']
 
 
 # Application definition
@@ -82,7 +83,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        #'NAME': '\\\\192.168.1.107\\StribC\\db.sqlite3',
     }
 }
 
@@ -125,6 +125,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    ]
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#    ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")

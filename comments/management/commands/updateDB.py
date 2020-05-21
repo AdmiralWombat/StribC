@@ -1,6 +1,8 @@
 import os.path
 from os import path
 
+from pathlib import Path
+
 import pickle
 
 from comments.models import Article
@@ -10,10 +12,14 @@ from comments.models import Comment
 from django.core.exceptions import ObjectDoesNotExist
 
 import sys
+import os
 
-sys.path.insert(1, 'D:\\Documents\\source\\WebScraping\\WebScraping')
+print(Path(__file__).parent.parent.parent.parent)
 
+#sys.path.insert(1, 'D:\\Documents\\source\\WebScraping\\WebScraping')
+sys.path.append(os.path.join(Path(__file__).parent.parent.parent.parent, 'StribC/WebScraping/WebScraping/'))
 import comment
+
 
 import re
 
@@ -25,12 +31,18 @@ class Command(BaseCommand):
     
     def _init(self):
         print("INITIALIZING")
-       
-       # UserCommenter.objects.all().delete()
-       # Article.objects.all().delete()
-       # Comment.objects.all().delete()
+        ospath = os.getenv('LOCALAPPDATA')
+        if ospath == None:
+            ospath = Path.home()
+            self.storage_directory = os.path.join(ospath, '.DCN/WebScraping/')
+            self.unix = 1
+        else:
+            self.storage_directory = os.path.join(ospath, 'DCN\\WebScraping\\')
+            self.unix = 0
 
-        self.storage_directory = os.path.join(os.getenv('LOCALAPPDATA'), 'DCN\\WebScraping\\')
+        #UserCommenter.objects.all().delete()
+        #Article.objects.all().delete()
+        #Comment.objects.all().delete()
 
     def add_arguments(self, parser):
         None
@@ -42,7 +54,10 @@ class Command(BaseCommand):
 
     def _loadArticles(self):
         print("LOADING")
-        articleDirectory = self.storage_directory + "\\"
+        if (self.unix == 1):
+            articleDirectory = self.storage_directory
+        else:
+            articleDirectory = self.storage_directory + "\\"
         for filename in os.listdir(articleDirectory):
             filepath = articleDirectory + filename
             print(f"\tATTEMPTING TO LOAD {filepath}")
@@ -50,11 +65,11 @@ class Command(BaseCommand):
                 with open(filepath, "rb") as f:
                     headComment = pickle.load(f)
             except FileNotFoundError as e:
-                print("FILE NOT FOUND")  
+                print("FILE NOT FOUND")
                 continue
             except Exception as e:
-                print("ERROR LOADING FILE")             
-                print(f"ERROR: {e}")      
+                print("ERROR LOADING FILE")
+                print(f"ERROR: {e}")
                 continue
 
             self._addToDB(headComment)
@@ -82,6 +97,7 @@ class Command(BaseCommand):
             except Exception as e:
                 print("\tERROR FINDING")
                 print(e)
+                return
 
 
 
