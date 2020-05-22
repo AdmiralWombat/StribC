@@ -4,4 +4,6 @@ stribcenv/*
 StribC/lib/*
 StribC/bin/*
 StribC/WebScraping/.vs/*
-
+comments/__pycache__/*
+comments/migrations/__pycache__/*
+StribC/__pycache__/*
