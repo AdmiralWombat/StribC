@@ -12,9 +12,6 @@ import time
 from pytz import timezone
 import pytz
 
-from bs4 import BeautifulSoup
-import pandas as pd
-
 from datetime import datetime, date, timedelta
 
 from article import Article
@@ -28,9 +25,6 @@ from pathlib import Path
 
 import re
 
-import feedparser
-
-import json
 import pickle
 
 class WebScrapping:
@@ -52,6 +46,7 @@ class WebScrapping:
             self.storage_data_directory = os.path.join(ospath, 'DCN\\WebScraping\\Data\\')
             Path(self.storage_data_directory).mkdir(parents=True, exist_ok=True)
             self.rssfilePath = self.storage_data_directory + "\\RSSArticleFeed.dat"
+            self.statsFilePath = self.storage_data_directory + "WebScrapping.dat"
 
         PATIENCE_TIME = 60
 
@@ -62,17 +57,19 @@ class WebScrapping:
         print("Running")
 
         startTime = time.perf_counter()
-
-        #self.driver = webdriver.Chrome(executable_path='D:\\Documents\\chromedriver_win32\\chromedriver.exe')
-        self.driver = webdriver.Chrome()
+               
+        try:
+            self.driver = webdriver.Chrome()
+        except:
+            self.driver = webdriver.Chrome(executable_path='D:\\Documents\\chromedriver_win32\\chromedriver.exe')
 
         self.rssArticleSet = set()
 
         self._loadRSSArticleSet(self.rssfilePath)
         i=0
-        for article in self.rssArticleSet:
-           self._parseArticle(article.url)
-           self.parseCount+=1
+        #for article in self.rssArticleSet:
+         #  self._parseArticle(article.url)
+         #  self.parseCount+=1
            #i+=1
            #if (i > 4):
            #    break
@@ -82,8 +79,10 @@ class WebScrapping:
         #self._parseArticle('https://www.startribune.com/minnesota-covid-19-cases-jump-by-786-with-23-more-deaths/570276032/')
         #self._parseArticle('https://www.startribune.com/wisconsin-bars-and-businesses-quickly-reopen-for-now/570471942/')
         #self._parseArticle('https://www.startribune.com/metro-transit-to-require-face-coverings-on-buses-trains/570513542/')
+
+        self._parseArticle('https://www.startribune.com/minnesota-state-fair-canceled-due-to-covid-19/570694142/')
         
-        time.sleep(10)
+        #time.sleep(10)
 
         endTime = time.perf_counter()
         totalTime = endTime - startTime
@@ -120,26 +119,31 @@ class WebScrapping:
 
     def _loadWebPage(self, url):
         self.driver.get(url)
+        print("Got URL, waiting for headline to load...")
         self._waitForLoad(self.driver, '//*[contains(@class, "article-headline")]', 10)
         try:
             self.article_title = self.driver.find_element_by_xpath('//*[contains(@class, "article-headline")]').text
             self.article_date = self.driver.find_element_by_xpath('//*[@class="article-dateline"]').text
-            self._waitForLoad(self.driver, '//*[@class="article-headline"]', 30)
+            print("Got title/date, waiting on comment src to load")
+            self._waitForLoad(self.driver, '//*[@id="news_talk_stream_iframe"]', 30)
             comment_src = self.driver.find_element_by_xpath('//*[@id="news_talk_stream_iframe"]').get_attribute("src")
         except NoSuchElementException as e:
             print(e)
-            return
+            return        
+        print("Got comment src, loading comment src url");
         self.driver.get(comment_src)
 
     def _loadMoreComments(self):
         while True:
             try:
       
-                loadMoreButton = self.driver.find_element_by_xpath('//*[@id="stream"]/div[3]/div[2]/div/div/div/div/div[3]/button')
-                time.sleep(1)                                                       
+                #loadMoreButton = self.driver.find_element_by_xpath('//*[@id="stream"]/div[3]/div[2]/div/div/div/div/div[3]/button')
+                loadMoreButton = self.driver.find_element_by_xpath('//button[contains(text(),"show more comments")]')
+                #loadMoreButton = self.driver.find_element_by_xpath('//button[contains(@class,"talk-load-more")]')
+                #time.sleep(1)                                                       
         
                 loadMoreButton.click()
-                time.sleep(1)
+                time.sleep(.1)
             except Exception as e:
                 print(e)
                 break
@@ -152,13 +156,13 @@ class WebScrapping:
 
         while True:
             try:
-                AllLoadMoreButtons = commentsContainer.find_elements_by_xpath("//div/button")
+                AllLoadMoreButtons = commentsContainer.find_elements_by_xpath("//button[contains(text(),'Show more replies')]")
                 showMoreTimes = 0
                 for loadMoreButton in AllLoadMoreButtons:
                     try:
-                        if loadMoreButton.text == 'SHOW MORE REPLIES':
-                            loadMoreButton.click()
-                            showMoreTimes += 1
+                        #if loadMoreButton.text == 'SHOW MORE REPLIES':
+                        loadMoreButton.click()
+                        showMoreTimes += 1
                     except ElementNotInteractableException as e:
                         print(e)
                     except ElementNotSelectableException as e:
@@ -170,7 +174,7 @@ class WebScrapping:
                     break
 
            
-                time.sleep(1)
+                time.sleep(.1)
             except Exception as e:
                 print(e)
                 break
@@ -215,13 +219,15 @@ class WebScrapping:
                 parent.children.append(newComment)
 
     def _parseArticle(self, url):
+        print("Loading webpage");
         self._loadWebPage(url)
         time.sleep(1);
+        print("Beginning to expand comments");
         self._loadMoreComments()
         print("Finished showing more")
         self._showMoreReplies()
         print('Done Expanding More')
-        time.sleep(2)
+        #time.sleep(2)
 
         hash_object = hashlib.md5(url.encode())
 
@@ -241,6 +247,14 @@ class WebScrapping:
             dt = datetime.now()
         central = timezone('US/Central')
         dt = dt.replace(tzinfo=central)       
+
+        today = datetime.now()
+        today = today.replace(tzinfo=central)
+        week_ago = today - timedelta(days=7)
+
+        if (dt < week_ago):
+            print("Article is too old, skipping")
+            return
 
         newArticle = Article(self.article_title, dt, url)
 
@@ -269,7 +283,7 @@ class WebScrapping:
         except Exception as e:
             print(e)
 
-        time.sleep(2)
+        #time.sleep(2)
 
         self._saveArticle(filePath, headComment)
 
